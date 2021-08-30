@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
@@ -12,10 +12,11 @@ import redis from 'redis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import cors  from 'cors';
+import { User } from "./entities/User";
 
 const main = async () => {
-
   const orm = await MikroORM.init(microConfig);
+  await orm.em.nativeDelete(User, {})
   await orm.getMigrator().up();
 
   const app = express();
@@ -23,6 +24,12 @@ const main = async () => {
   const RediStore = connectRedis(session);
   const redisClient = redis.createClient();
   
+  // app.use(
+  //   cors({
+  //     origin: "http://localhost:3000",
+  //     credentials:true,
+  //   })
+  // )
   app.use(
     cors({
       origin: "http://localhost:3000",
@@ -31,7 +38,7 @@ const main = async () => {
   )
   app.use(
     session({
-      name: 'qid',
+      name: COOKIE_NAME,
       store: new RediStore({ 
         client: redisClient,
         disableTouch: true,
@@ -43,8 +50,8 @@ const main = async () => {
         secure: __prod__, // cookie only works in https
       },
       secret: "hehehehehehehe",
-      resave: true,
-      saveUninitialized: true
+      resave: false,
+      saveUninitialized: false
     })
   )
 
