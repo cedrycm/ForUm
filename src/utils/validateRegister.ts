@@ -1,6 +1,6 @@
 import { UsernamePasswordInput } from "../resolvers/UsernamePasswordInput"
 export const validateRegister = (options: UsernamePasswordInput) => {
-  if(options.username.length <= 2 ) {
+  if(options.username.length < 2 ) {
     return  [
       {
         field: "username",
@@ -26,10 +26,10 @@ export const validateRegister = (options: UsernamePasswordInput) => {
       ];
   }
 
-  if(options.password.length <= 3 ) {
+  if(options.password.length < 2 ) {
     return [
       {
-        field: "username",
+        field: "password",
         message: "length must be greater than 3",
       },
     ];
