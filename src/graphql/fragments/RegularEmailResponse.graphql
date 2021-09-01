@@ -1,0 +1,6 @@
+fragment RegularEmailResponse on EmailResponse {
+  errors {
+    ...RegularError
+  }
+  emailSent
+}
