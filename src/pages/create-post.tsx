@@ -1,15 +1,14 @@
-import { Box, Flex, Link } from "@chakra-ui/layout";
+import { Box } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
-import router from "next/router";
+// import router from "next/router";
 import React from "react";
 import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
 import { useCreatePostMutation } from "../generated/graphql";
-import { toErrorMap } from "../utils/toErrorMap";
-import login from "./login";
+// import { toErrorMap } from "../utils/toErrorMap";
 
-export const CreatePost: React.FC<{}> = ({}) => {
+ const CreatePost: React.FC<{}> = ({}) => {
   const [, createPost] = useCreatePostMutation();
   return (
     <Wrapper variant="small">
@@ -45,3 +44,5 @@ export const CreatePost: React.FC<{}> = ({}) => {
     </Wrapper>
   );
 };
+
+export default CreatePost;
