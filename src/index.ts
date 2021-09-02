@@ -28,7 +28,7 @@ const main = async () => {
     migrations: [path.join(__dirname,"./migrations/*")],
   });
 
-  await conn.runMigrations();
+  // await conn.runMigrations();
   // await Post.delete({})
 
   const app = express();
@@ -38,7 +38,7 @@ const main = async () => {
   
   app.use(
     cors({
-      origin: "http://localhost:3000", //" https://studio.apollographql.com", //
+      origin: "https://studio.apollographql.com", //"http://localhost:3000", //
       credentials:true,
     })
   )

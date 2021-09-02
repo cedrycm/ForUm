@@ -1,4 +1,4 @@
-import { Resolver, Arg, Ctx, Mutation, Field, ObjectType, Query } from "type-graphql";
+import { Resolver, Arg, Ctx, Mutation, Field, ObjectType, Query, Root, FieldResolver } from "type-graphql";
 import { User } from "../entities/User";
 import { MyContext} from "../types";
 import argon2 from "argon2";
@@ -8,6 +8,7 @@ import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { getConnection } from "typeorm";
+import e from "express";
 
 @ObjectType()
 class FieldError {
@@ -35,8 +36,18 @@ class EmailResponse {
   emailSent: Boolean;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() {req}: MyContext) {
+    if(req.session.UserID === user.id) {
+      return user.email;
+    }
+    else {
+      return "";
+    }
+  }
+
   @Mutation(() => EmailResponse)
   async forgotPassword(
     @Arg('email') email: string,
