@@ -3,22 +3,25 @@ import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import { usePostsQuery } from "../generated/graphql";
 import { Layout } from "../components/Layout";
-import React from "react";
+import React, { useState } from "react";
 import { NextChakraLink } from "../components/NextChakraLink";
 import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
+import { PostCard } from "../components/PostCard";
 
 const Index = () => {
+  const [variables, setVariables] = useState({
+    limit: 10,
+    cursor: null as null | string,
+  });
   const [{ data, fetching }] = usePostsQuery({
-    variables: {
-      postsLimit: 10,
-      postsCursor: null,
-    },
+    variables,
   });
 
   if (!fetching && !data) {
     return <div>No Posts Were Found!</div>;
   }
+
   return (
     <Layout>
       <Flex align="content-center">
@@ -32,17 +35,25 @@ const Index = () => {
         <div>loading...</div>
       ) : (
         <Stack spacing={8}>
-          {data!.posts.map((p) => (
-            <Box key={p.id} p={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{p.title}</Heading>
-              <Text>{p.textSnippet}</Text>
-            </Box>
+          {data!.posts.posts.map((p) => (
+            //Abstracted out to ../components/PostCard
+            <PostCard post={p}></PostCard>
           ))}
         </Stack>
       )}
-      {data ? (
+      {data && data.posts.hasMore ? (
         <Flex>
-          <Button isLoading={fetching} m="auto" my={8}>
+          <Button
+            onClick={() =>
+              setVariables({
+                limit: variables.limit,
+                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt,
+              })
+            }
+            isLoading={fetching}
+            m="auto"
+            my={8}
+          >
             load more
           </Button>
         </Flex>
