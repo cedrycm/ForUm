@@ -1,4 +1,5 @@
-import { Resolver, Query, Arg, Mutation, InputType, Field, Ctx, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, Field, FieldResolver, InputType, Int, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
+import { getConnection } from "typeorm";
 import { Post } from "../entities/Post";
 import { isAuth } from "../middleware/isAuth";
 import { MyContext } from "../types";
@@ -11,11 +12,32 @@ class PostInput {
   text: string
 }
 
-@Resolver()
+@Resolver(Post)
 export class PostResolver {
+  @FieldResolver(() => String)
+  textSnippet(
+    @Root() root: Post
+  ){
+    return root.text.slice(0,50);
+  }
+
   @Query(() => [Post])
-  async posts(): Promise<Post[]>{
-    return Post.find();
+  async posts(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, {nullable: true}) cursor: string | null
+  ): Promise<Post[]>{
+    const realLimit = Math.max(50, limit);
+    const qb = getConnection()
+    .getRepository(Post)
+    .createQueryBuilder("p")
+    .orderBy('"createdAt"', "DESC")
+    .take(realLimit);
+
+    if(cursor){
+      qb.where('"createdAt" < :cursor',{cursor: new Date(parseInt(cursor))})
+    }
+ 
+    return qb.getMany();
   }
 
   @Query(() => Post, {nullable:true})
