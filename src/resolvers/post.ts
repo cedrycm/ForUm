@@ -58,6 +58,7 @@ export class PostResolver {
     // and they are changing their vote
     if (vouch && vouch.value !== realValue) {
       await getConnection().transaction(async (tm) => {
+        //update vouch table
         await tm.query(
           `
     update vouch
@@ -66,7 +67,7 @@ export class PostResolver {
         `,
           [realValue, postId, userId]
         );
-
+        //update post points
         await tm.query(
           `
           update post
@@ -77,8 +78,9 @@ export class PostResolver {
         );
       });
     } else if (!vouch) {
-      // has never voted before
+      // hasn't voted on this post before
       await getConnection().transaction(async (tm) => {
+        //insert into vouch table
         await tm.query(
           `
     insert into vouch ("userId", "postId", value)
@@ -86,7 +88,7 @@ export class PostResolver {
         `,
           [userId, postId, realValue]
         );
-
+        //update post points
         await tm.query(
           `
     update post
