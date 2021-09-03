@@ -1,18 +1,22 @@
 import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import { useRouter } from "next/router";
-import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from "urql";
-import { pipe, tap } from 'wonka';
-import
-  {
-    LoginMutation,
-    LogoutMutation,
-    MeDocument,
-    MeQuery,
-    RegisterMutation
-  } from "../generated/graphql";
+import {
+  dedupExchange,
+  Exchange,
+  fetchExchange,
+  stringifyVariables,
+} from "urql";
+import { pipe, tap } from "wonka";
+import {
+  LoginMutation,
+  LogoutMutation,
+  MeDocument,
+  MeQuery,
+  RegisterMutation,
+} from "../generated/graphql";
 import { betterUpdateQuery } from "./betterUpdateQuery";
 
-export type MergeMode = 'before' | 'after';
+export type MergeMode = "before" | "after";
 
 export interface PaginationParams {
   cursorArgument?: string;
@@ -21,26 +25,27 @@ export interface PaginationParams {
   mergeMode?: MergeMode;
 }
 
-export const errorExchange: Exchange = ({ forward }) => ops$ => {
-  const router = useRouter();
-  return pipe(
-    forward(ops$),
-    tap(({ error }) => {
-      // If the OperationResult has an error send a request to sentry
-      if (error) {
-        // the error is a CombinedError with networkError and graphqlErrors properties
-        if (error?.message.includes("not authenticated")) {
-          router.replace("/login");
+export const errorExchange: Exchange =
+  ({ forward }) =>
+  (ops$) => {
+    const router = useRouter();
+    return pipe(
+      forward(ops$),
+      tap(({ error }) => {
+        // If the OperationResult has an error send a request to sentry
+        if (error) {
+          // the error is a CombinedError with networkError and graphqlErrors properties
+          if (error?.message.includes("not authenticated")) {
+            router.replace("/login");
+          }
+          // sentryFireAndForgetHere() // Whatever error reporting you have
         }
-        // sentryFireAndForgetHere() // Whatever error reporting you have
-      }
-    })
-  );
-};
+      })
+    );
+  };
 
-
-//Client side resolver for pagination 
- const cursorPagination = ({}: PaginationParams = {}): Resolver => {
+//Client side resolver for pagination
+const cursorPagination = ({}: PaginationParams = {}): Resolver => {
   return (_parent, fieldArgs, cache, info) => {
     const { parentKey: entityKey, fieldName } = info;
     const allFields = cache.inspectFields(entityKey);
@@ -53,26 +58,26 @@ export const errorExchange: Exchange = ({ forward }) => ops$ => {
     const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`;
     const isItInTheCache = cache.resolve(
       cache.resolve(entityKey, fieldKey) as string,
-       "posts"
-       );
+      "posts"
+    );
     info.partial = !isItInTheCache;
     const results: string[] = [];
-    let hasMore = true; 
+    let hasMore = true;
     fieldInfos.forEach((fi) => {
       const key = cache.resolve(entityKey, fi.fieldKey) as string;
-      const data = cache.resolve(key, "posts")as string[];
+      const data = cache.resolve(key, "posts") as string[];
       const _hasMore = cache.resolve(key, "hasMore");
-      if(!_hasMore) {
+      if (!_hasMore) {
         hasMore = _hasMore as boolean;
       }
-      console.log("data:", data, "hasMore:", hasMore)
+      console.log("data:", data, "hasMore:", hasMore);
       results.push(...data);
     });
 
     return {
       __typename: "PaginatedPosts",
       hasMore,
-      posts: results
+      posts: results,
     };
 
     // const visited = new Set();
@@ -138,9 +143,9 @@ export const createUrqlClient = (ssrExchange: any) => ({
     dedupExchange,
     cacheExchange({
       keys: {
-        PaginatedPosts: () => null
+        PaginatedPosts: () => null,
       },
-      resolvers:{
+      resolvers: {
         Query: {
           posts: cursorPagination(),
         },
