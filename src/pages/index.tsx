@@ -5,7 +5,7 @@ import { usePostsQuery } from "../generated/graphql";
 import { Layout } from "../components/Layout";
 import React, { useState } from "react";
 import { NextChakraLink } from "../components/NextChakraLink";
-import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/layout";
+import { Flex, Heading, Stack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { PostCard } from "../components/PostCard";
 
