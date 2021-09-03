@@ -32,7 +32,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     );
     //user is logged in
   } else {
-    console.log(data);
+    // console.log(data);
     body = (
       <Flex>
         <Box mr={2}>{data.me.username}</Box>
