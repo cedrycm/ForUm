@@ -9,13 +9,17 @@ import { Flex, Heading, Stack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { PostCard } from "../components/PostCard";
 
+
 const Index = () => {
   const [variables, setVariables] = useState({
     limit: 10,
     cursor: null as null | string,
   });
   const [{ data, fetching }] = usePostsQuery({
-    variables,
+    variables: {
+      limit: 10,
+      cursor: null as null | string,
+    },
   });
 
   if (!fetching && !data) {
@@ -37,7 +41,7 @@ const Index = () => {
         <Stack spacing={8}>
           {data!.posts.posts.map((p) => (
             //Abstracted out to ../components/PostCard
-            <PostCard post={p}></PostCard>
+            <PostCard post={p} key={p.id}></PostCard>
           ))}
         </Stack>
       )}
@@ -61,5 +65,22 @@ const Index = () => {
     </Layout>
   );
 };
+
+// export async function getStaticProps(ctx: any) {
+//   const ssrCache = ssrExchange({ isClient: false });
+//   const client = getUrqlClientSS(ssrExchange({ isClient: false }), ctx);
+
+//   // This query is used to populate the cache for the query
+//   // used on this page.
+//   await client!.query(INDEX_QUERY).toPromise();
+
+//   return {
+//     props: {
+//       // urqlState is a keyword here so withUrqlClient can pick it up.
+//       urqlState: ssrCache.extractData(),
+//     },
+//     revalidate: 600,
+//   };
+// }
 
 export default withUrqlClient(createUrqlClient, { ssr: false })(Index);

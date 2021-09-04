@@ -1,0 +1,9 @@
+fragment CreatorSnippet on Post {
+  creator {
+    id
+    username
+    email
+    createdAt
+    updatedAt
+  }
+}

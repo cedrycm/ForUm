@@ -16,28 +16,36 @@ export const VoteSection: React.FC<VoteSectionProps> = ({ post }) => {
   return (
     <Flex direction="column" alignItems="center" justifyContent="center" mr={4}>
       <IconButton
-        onClick={() => {
+        onClick={async () => {
+          if (post.voteStatus === 1) {
+            return;
+          }
           setLoadingState("vouch-loading");
-          vote({
-            votePostId: post.id,
-            voteValue: 1,
+          await vote({
+            postId: post.id,
+            value: 1,
           });
           setLoadingState("not-loading");
         }}
+        colorScheme={post.voteStatus === 1 ? "green" : undefined}
         isLoading={loadingState === "vouch-loading"}
         aria-label="vote up"
         icon={<ChevronUpIcon boxSize="24px" />}
       />
       {post.points}
       <IconButton
-        onClick={() => {
+        onClick={async () => {
+          if (post.voteStatus === -1) {
+            return;
+          }
           setLoadingState("no-vouch-loading");
-          vote({
-            votePostId: post.id,
-            voteValue: -1,
+          await vote({
+            postId: post.id,
+            value: -1,
           });
           setLoadingState("not-loading");
         }}
+        colorScheme={post.voteStatus === -1 ? "red" : undefined}
         isLoading={loadingState === "no-vouch-loading"}
         aria-label="vote down"
         icon={<ChevronDownIcon boxSize="24px" />}

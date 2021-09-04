@@ -1,0 +1,4 @@
+fragment PostsSnippet on Post {
+  ...PostSnippet
+  ...CreatorSnippet
+}

@@ -95,6 +95,7 @@ export type Post = {
   title: Scalars['String'];
   text: Scalars['String'];
   points: Scalars['Float'];
+  voteStatus?: Maybe<Scalars['Int']>;
   creatorId: Scalars['Float'];
   creator: User;
   createdAt: Scalars['String'];
@@ -147,7 +148,11 @@ export type UsernamePasswordInput = {
   email: Scalars['String'];
 };
 
-export type PostSnippetFragment = { __typename?: 'Post', id: number, title: string, points: number, createdAt: string, updatedAt: string, textSnippet: string, creator: { __typename?: 'User', id: number, username: string } };
+export type CreatorAndPostSnippetFragment = { __typename?: 'Post', id: number, title: string, points: number, createdAt: string, updatedAt: string, textSnippet: string, voteStatus?: Maybe<number>, creator: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } };
+
+export type CreatorSnippetFragment = { __typename?: 'Post', creator: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } };
+
+export type PostSnippetFragment = { __typename?: 'Post', id: number, title: string, points: number, createdAt: string, updatedAt: string, textSnippet: string, voteStatus?: Maybe<number> };
 
 export type RegularEmailResponseFragment = { __typename?: 'EmailResponse', emailSent: boolean, errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>> };
 
@@ -170,7 +175,7 @@ export type CreatePostMutationVariables = Exact<{
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: number, title: string, points: number, createdAt: string, updatedAt: string, textSnippet: string, creator: { __typename?: 'User', id: number, username: string } } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: number, title: string, points: number, createdAt: string, updatedAt: string, textSnippet: string, voteStatus?: Maybe<number> } };
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
@@ -200,8 +205,8 @@ export type RegisterMutationVariables = Exact<{
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', id: number, username: string }> } };
 
 export type VoteMutationVariables = Exact<{
-  voteValue: Scalars['Int'];
-  votePostId: Scalars['Int'];
+  value: Scalars['Int'];
+  postId: Scalars['Int'];
 }>;
 
 
@@ -218,7 +223,7 @@ export type PostsQueryVariables = Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, posts: Array<{ __typename?: 'Post', id: number, title: string, points: number, createdAt: string, updatedAt: string, textSnippet: string, creator: { __typename?: 'User', id: number, username: string } }> } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, posts: Array<{ __typename?: 'Post', id: number, title: string, points: number, createdAt: string, updatedAt: string, textSnippet: string, voteStatus?: Maybe<number>, creator: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } }> } };
 
 export const PostSnippetFragmentDoc = gql`
     fragment PostSnippet on Post {
@@ -228,12 +233,27 @@ export const PostSnippetFragmentDoc = gql`
   createdAt
   updatedAt
   textSnippet
+  voteStatus
+}
+    `;
+export const CreatorSnippetFragmentDoc = gql`
+    fragment CreatorSnippet on Post {
   creator {
     id
     username
+    email
+    createdAt
+    updatedAt
   }
 }
     `;
+export const CreatorAndPostSnippetFragmentDoc = gql`
+    fragment CreatorAndPostSnippet on Post {
+  ...PostSnippet
+  ...CreatorSnippet
+}
+    ${PostSnippetFragmentDoc}
+${CreatorSnippetFragmentDoc}`;
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
   field
@@ -330,8 +350,8 @@ export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
 export const VoteDocument = gql`
-    mutation Vote($voteValue: Int!, $votePostId: Int!) {
-  vote(value: $voteValue, postId: $votePostId)
+    mutation Vote($value: Int!, $postId: Int!) {
+  vote(value: $value, postId: $postId)
 }
     `;
 
@@ -355,11 +375,11 @@ export const PostsDocument = gql`
   posts(cursor: $cursor, limit: $limit) {
     hasMore
     posts {
-      ...PostSnippet
+      ...CreatorAndPostSnippet
     }
   }
 }
-    ${PostSnippetFragmentDoc}`;
+    ${CreatorAndPostSnippetFragmentDoc}`;
 
 export function usePostsQuery(options: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<PostsQuery>({ query: PostsDocument, ...options });
