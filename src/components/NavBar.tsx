@@ -72,7 +72,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   }
   return (
     <Flex
-      z={1}
+      zIndex={1}
       alignItems="center"
       position="sticky"
       top={0}
