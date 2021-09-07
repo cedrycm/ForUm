@@ -3,6 +3,7 @@ import { EditIcon } from "@chakra-ui/icons";
 import { Box, Flex, Link } from "@chakra-ui/layout";
 import { Heading, IconButton } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { DarkModeButton } from "./DarkModeSwitch";
@@ -11,6 +12,7 @@ import { NextChakraLink } from "./NextChakraLink";
 
 interface NavBarProps {}
 export const NavBar: React.FC<NavBarProps> = ({}) => {
+  const router = useRouter();
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery({});
   let body = null;
@@ -22,17 +24,19 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   } else if (!data?.me) {
     body = (
       <>
-        <Box mr={2}>
-          <DarkModeButton />
-        </Box>
-        <NextLink href="/login">
-          <Link color="white" mr={2}>
-            login
-          </Link>
-        </NextLink>
-        <NextLink href="/register">
-          <Link color="white">register</Link>
-        </NextLink>
+        <Flex alignItems="center">
+          <Box mr={2}>
+            <DarkModeButton />
+          </Box>
+          <NextLink href="/login">
+            <Link color="white" mr={2}>
+              login
+            </Link>
+          </NextLink>
+          <NextLink href="/register">
+            <Link color="white">register</Link>
+          </NextLink>
+        </Flex>
       </>
     );
     //user is logged in
@@ -57,8 +61,9 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         </Box>
         <Box mr={2}>{data.me.username}</Box>
         <Button
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            await logout();
+            router.reload();
           }}
           isLoading={logoutFetching}
           colorScheme="whiteAlpha"
