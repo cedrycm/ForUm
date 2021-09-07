@@ -12,7 +12,6 @@ interface PostCardProps {
 export const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const router = useRouter();
   const isIndex = router.pathname === "/";
-  console.log(isIndex);
 
   if (isIndex) {
     return <PostCardStack post={post} />;

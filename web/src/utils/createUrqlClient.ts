@@ -19,7 +19,7 @@ import {
 import { betterUpdateQuery } from "./betterUpdateQuery";
 import { gql } from "@urql/core";
 import { isServer } from "./isServer";
-import { NextUrqlClientConfig, initUrqlClient } from "next-urql";
+import { NextUrqlClientConfig } from "next-urql";
 
 export type MergeMode = "before" | "after";
 
@@ -149,7 +149,7 @@ export const createUrqlClient: NextUrqlClientConfig = (
                 `,
                 { id: postId }
               ); // Data or null
-              console.log("data:", data);
+              // console.log("data:", data);
               if (data) {
                 if (data.voteStatus === value) {
                   // const newPoints =

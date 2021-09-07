@@ -26,7 +26,7 @@ export const Post = ({}) => {
     );
   }
 
-  console.log("data:", data);
+  // console.log("data:", data);
   return (
     <Layout>
       <PostCard post={data?.post} />
