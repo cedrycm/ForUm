@@ -4,11 +4,9 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 import { usePostsQuery } from "../generated/graphql";
 import { Layout } from "../components/Layout";
 import React, { useState } from "react";
-import { NextChakraLink } from "../components/NextChakraLink";
-import { Flex, Heading, Stack } from "@chakra-ui/layout";
+import { Flex, Stack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
-import { PostCard } from "../components/PostCard";
-
+import { PostCard } from "../components/post-cards/PostCard";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -28,21 +26,17 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex align="content-center">
-        <Heading>ForUm</Heading>
-        <NextChakraLink ml="auto" href="/create-post" as={`/create-post`}>
-          create post
-        </NextChakraLink>
-      </Flex>
       <br />
       {fetching && !data ? (
         <div>loading...</div>
       ) : (
         <Stack spacing={8}>
-          {data!.posts.posts.map((p) => (
-            //Abstracted out to ../components/PostCard
-            <PostCard post={p} key={p.id}></PostCard>
-          ))}
+          {data!.posts.posts.map((p) =>
+            !p ? null : (
+              //Abstracted out to ../components/PostCard
+              <PostCard post={p} key={p.id}></PostCard>
+            )
+          )}
         </Stack>
       )}
       {data && data.posts.hasMore ? (

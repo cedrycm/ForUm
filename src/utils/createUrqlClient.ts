@@ -8,6 +8,7 @@ import {
 } from "urql";
 import { pipe, tap } from "wonka";
 import {
+  DeletePostMutationVariables,
   LoginMutation,
   LogoutMutation,
   MeDocument,
@@ -140,15 +141,13 @@ const cursorPagination = (): Resolver => {
 export const createUrqlClient: NextUrqlClientConfig = (
   ssrExchange: any,
   ctx?: any //NextUrqlContext | undefined
-) =>
-{
-  
+) => {
   //coookie caching not working
   let cookie = "";
-  console.log(isServer());
+
   if (isServer()) {
-    console.log("Context:", ctx);
-    //cookie = ctx.req.headers.cookie;
+    // console.log("Context:", ctx);
+    cookie = ctx?.req?.headers?.cookie;
   }
 
   return {
@@ -174,6 +173,12 @@ export const createUrqlClient: NextUrqlClientConfig = (
         },
         updates: {
           Mutation: {
+            deletePost: (_result, args, cache, info) => {
+              cache.invalidate({
+                __typename: "Post",
+                id: (args as DeletePostMutationVariables).id,
+              });
+            },
             vote: (_result, args, cache, info) => {
               const { postId, value } = args as VoteMutationVariables;
 
