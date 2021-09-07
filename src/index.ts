@@ -18,7 +18,9 @@ import { Vouch } from "./entities/Vouch";
 import { createUserLoader } from "./utils/createUserLoader";
 import { createVouchLoader } from "./utils/createVouchLoader";
 
-//rr
+//dokku env
+//db: forum-db
+//redis: foredis
 const main = async () => {
   const conn = await createConnection({
     type: "postgres",
