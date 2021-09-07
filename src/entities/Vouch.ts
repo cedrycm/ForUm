@@ -33,6 +33,8 @@ export class Vouch extends BaseEntity {
   @PrimaryColumn()
   postId: number;
 
-  @ManyToOne(() => Post, (post) => post.vouches)
+  @ManyToOne(() => Post, (post) => post.vouches, {
+    onDelete: "CASCADE",
+  })
   post: Post;
 }
