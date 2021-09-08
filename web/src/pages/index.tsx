@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { Flex, Stack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { PostCard } from "../components/post-cards/PostCard";
+import { Box, useColorModeValue } from "@chakra-ui/react";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -30,14 +31,25 @@ const Index = () => {
       {fetching && !data ? (
         <div>loading...</div>
       ) : (
-        <Stack spacing={8}>
-          {data!.posts.posts.map((p) =>
-            !p ? null : (
-              //Abstracted out to ../components/PostCard
-              <PostCard post={p} key={p.id}></PostCard>
-            )
-          )}
-        </Stack>
+        <Box
+          w="full"
+          maxW=""
+          mx="auto"
+          px={2}
+          py={2}
+          bg={useColorModeValue("white", "gray.800")}
+          shadow="md"
+          rounded="md"
+        >
+          <Stack spacing={8}>
+            {data!.posts.posts.map((p) =>
+              !p ? null : (
+                //Abstracted out to ../components/PostCard
+                <PostCard post={p} key={p.id}></PostCard>
+              )
+            )}
+          </Stack>
+        </Box>
       )}
       {data && data.posts.hasMore ? (
         <Flex>
