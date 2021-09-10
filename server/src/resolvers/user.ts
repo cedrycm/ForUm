@@ -89,10 +89,7 @@ export class UserResolver {
     );
 
     console.log({ tokenkey: token });
-    await sendEmail(
-      email,
-      `<a href="http://localhost:3000/change-password/${token}">reset password</a>`
-    );
+    await sendEmail(email, token);
 
     return { emailSent: true };
   }
